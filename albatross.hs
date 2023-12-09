@@ -6,7 +6,9 @@ targetHeight = 15
 data Comp = Comp Nature Int deriving Show
 data Nature = Entire | Begin | Mid | End deriving Show
 
-main = print $ pageShape paragraphLengths
+main = do
+    putStrLn "~.~.~  A L B A T R O S S  ~.~.~"
+    print $ pageShape paragraphLengths
 
 pageShape :: [Int] -> [[Comp]]
 pageShape (para:paras) =
