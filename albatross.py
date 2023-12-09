@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 PARAGRAPHS = [ 4, 5, 6, 5, 3, 8, 10, 3, 5, 3, 9, 3, 2, 2, 6]
 TARGET_HEIGHT = 15
 
@@ -41,5 +44,5 @@ for paragraph_remaining in PARAGRAPHS:
 for shape in page_shapes:
     print(f'Total page length: {sum([lines for (partype, lines) in shape])}')
     for (partype, lines) in shape:
-        widow = ' (widow!)' if partype is 'END' and lines == 1 else ''
+        widow = ' (widow!)' if partype == 'END' and lines == 1 else ''
         print(f'   {partype} paragraph of {lines} lines{widow}')
