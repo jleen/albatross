@@ -4,11 +4,14 @@ paragraphLengths = [ 4, 5, 6, 5, 3, 8, 10, 3, 5, 3, 9, 3, 2, 2, 6 ]
 targetHeight = 15
 
 data Comp = Comp Nature Int deriving Show
-data Nature = Entire | Begin | Mid | End deriving Show
+data Nature = Entire | Begin | Mid | End deriving (Show, Eq)
 
 main = do
     putStrLn "~.~.~  A L B A T R O S S  ~.~.~"
-    print $ pageShape paragraphLengths
+    putStrLn ""
+    let shape = pageShape paragraphLengths
+    print shape
+    print $ [i | (i,s) <- zip [0..] $ map (filter (\x -> let Comp n i = x in n == End && i == 1)) shape, length s > 0]
 
 pageShape :: [Int] -> [[Comp]]
 pageShape (para:paras) =
