@@ -1,4 +1,4 @@
-import Debug.Trace (traceShow)
+import Data.List
 
 paragraphLengths = [ 4, 5, 6, 5, 3, 8, 10, 3, 5, 3, 9, 3, 2, 2, 6 ]
 targetHeight = 15
@@ -10,8 +10,12 @@ main = do
     putStrLn "~.~.~  A L B A T R O S S  ~.~.~"
     putStrLn ""
     let shapes = pageShapes paragraphLengths
+    putStr "Page shapes "
     print shapes
-    print $ map (any (\(Comp n i) -> n == End && i == 1)) shapes
+    case findIndex (any (\(Comp n i) -> n == End && i == 1)) shapes of
+        Just x -> putStr "First widow on page " >> print x
+        Nothing -> putStr "No widows"
+
 
 pageShapes :: [Int] -> [[Comp]]
 pageShapes (para:paras) =
