@@ -9,12 +9,12 @@ data Nature = Entire | Begin | Mid | End deriving (Show, Eq)
 main = do
     putStrLn "~.~.~  A L B A T R O S S  ~.~.~"
     putStrLn ""
-    let shape = pageShape paragraphLengths
-    print shape
-    print $ [i | (i,s) <- zip [0..] $ map (filter (\x -> let Comp n i = x in n == End && i == 1)) shape, length s > 0]
+    let shapes = pageShapes paragraphLengths
+    print shapes
+    print $ map (any (\(Comp n i) -> n == End && i == 1)) shapes
 
-pageShape :: [Int] -> [[Comp]]
-pageShape (para:paras) =
+pageShapes :: [Int] -> [[Comp]]
+pageShapes (para:paras) =
     iter para paras [] targetHeight False []
       where iter paragraphRemaining paras currentShape pageRemaining isPartial shapes
               | paragraphRemaining == 0 = case paras of
