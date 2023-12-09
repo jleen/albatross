@@ -13,7 +13,7 @@ main = do
 
 
 findFirstWidow :: [[Comp]] -> Maybe Int
-findFirstWidow shape = succ <$> findIndex (any (\(Comp n i) -> n == End && i == 1)) shape
+findFirstWidow = fmap succ . findIndex (any (\(Comp n i) -> n == End && i == 1))
 
 
 pageShapesNoWidows :: [Int] -> [Int] -> [[Comp]]
