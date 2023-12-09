@@ -9,20 +9,23 @@ data Nature = Entire | Begin | Mid | End deriving (Show, Eq)
 main = do
     putStrLn "~.~.~  A L B A T R O S S  ~.~.~"
     putStrLn ""
-    let shapes = pageShapes paragraphLengths [2]
-    putStr "Page shapes "
-    print shapes
-    case findFirstWidow shapes of
-        Just x -> putStr "First widow on page " >> print x
-        Nothing -> putStr "No widows"
+    print $ pageShapesNoWidows paragraphLengths []
 
 
 findFirstWidow :: [[Comp]] -> Maybe Int
-findFirstWidow = findIndex (any (\(Comp n i) -> n == End && i == 1))
+findFirstWidow shape = succ <$> findIndex (any (\(Comp n i) -> n == End && i == 1)) shape
 
 
+pageShapesNoWidows :: [Int] -> [Int] -> [[Comp]]
+pageShapesNoWidows paras shortPages =
+    let shapes = pageShapes paras shortPages
+    in case findFirstWidow shapes of
+        Nothing -> shapes
+        Just p -> pageShapesNoWidows paras (shortPages ++ [p])
+        
+    
 pageShapes :: [Int] -> [Int] -> [[Comp]]
-pageShapes (para:paras) shortPages = iter para paras 0 [] (pageLen 0) False []
+pageShapes (para:paras) shortPages = iter para paras 1 [] (pageLen 1) False []
       where pageLen p = targetHeight - if (p+1) `elem` shortPages then 1 else 0
             iter paragraphRemaining paras pageNum currentShape pageRemaining isPartial shapes
               | paragraphRemaining == 0 = case paras of
