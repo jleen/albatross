@@ -15,7 +15,7 @@ pageShape (para:paras) =
     iter para paras [] targetHeight False []
       where iter paragraphRemaining paras currentShape pageRemaining isPartial shapes
               | paragraphRemaining == 0 = case paras of
-                  [] -> shapes
+                  [] -> shapes ++ [currentShape]
                   p:ps -> iter p ps currentShape pageRemaining isPartial shapes
               | pageRemaining == 0 =
                   iter paragraphRemaining paras [] targetHeight isPartial
