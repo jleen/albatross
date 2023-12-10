@@ -1,4 +1,5 @@
 import Data.List
+import Debug.Trace
 
 paragraphLengths = [ 4, 5, 6, 5, 3, 8, 10, 3, 5, 3, 9, 3, 2, 2, 6 ]
 targetHeight = 15
@@ -16,12 +17,16 @@ findFirstWidow :: [[Comp]] -> Maybe Int
 findFirstWidow = fmap succ . findIndex (any (\(Comp n i) -> n == End && i == 1))
 
 
-pageShapesNoWidows :: [Int] -> [Int] -> [[Comp]]
+spread p = [v,v+1] where v = 2 * (p `div` 2)
+
+
+pageShapesNoWidows :: [Int] -> [Int] -> Maybe [[Comp]]
 pageShapesNoWidows paras shortPages =
+    traceShow shortPages $
     let shapes = pageShapes paras shortPages
     in case findFirstWidow shapes of
-        Nothing -> shapes
-        Just p -> pageShapesNoWidows paras (shortPages ++ [p])
+        Nothing -> Just shapes
+        Just p -> if p `elem` shortPages then Nothing else pageShapesNoWidows paras (shortPages ++ spread p)
         
     
 pageShapes :: [Int] -> [Int] -> [[Comp]]
