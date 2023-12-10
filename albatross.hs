@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 import Data.List
 import Debug.Trace
 
@@ -29,23 +31,38 @@ pageShapesNoWidows paras shortPages =
         Just p -> if p `elem` shortPages then Nothing else pageShapesNoWidows paras (shortPages ++ spread p)
         
     
+data State = State {
+    paragraphRemaining :: Int,
+    paras :: [Int],
+    pageNum :: Int,
+    currentShape :: [Comp],
+    pageRemaining :: Int,
+    isPartial :: Bool,
+    shapes :: [[Comp]]
+} deriving (Show)
+
+
 pageShapes :: [Int] -> [Int] -> [[Comp]]
-pageShapes (para:paras) shortPages = iter para paras 1 [] (pageLen 1) False []
+pageShapes (para:paras) shortPages = iter $ State para paras 1 [] (pageLen 1) False []
       where pageLen p = targetHeight - if (p+1) `elem` shortPages then 1 else 0
-            iter paragraphRemaining paras pageNum currentShape pageRemaining isPartial shapes
+            iter s@State{..}
               | paragraphRemaining == 0 = case paras of
                   [] -> shapes ++ [currentShape]
-                  p:ps -> iter p ps pageNum currentShape pageRemaining isPartial shapes
+                  p:ps -> iter s{paragraphRemaining=p, paras=ps}
               | pageRemaining == 0 =
-                  iter paragraphRemaining paras (pageNum+1) [] (pageLen (pageNum+1)) isPartial
-                       (shapes ++ [currentShape])
+                  iter s{pageNum=(pageNum+1),
+                         currentShape=[],
+                         pageRemaining=(pageLen (pageNum+1)),
+                         shapes=(shapes ++ [currentShape])}
               | paragraphRemaining <= pageRemaining =
-                  iter 0 paras pageNum
-                       (currentShape ++ [Comp (if isPartial then End else Entire)
-                                              paragraphRemaining])
-                       (pageRemaining - paragraphRemaining) False shapes
+                  iter s{paragraphRemaining=0,
+                         currentShape=(currentShape ++ [Comp (if isPartial then End else Entire) paragraphRemaining]),
+                         pageRemaining=(pageRemaining - paragraphRemaining),
+                         isPartial=False}
               | otherwise =
-                  iter (paragraphRemaining - pageRemaining) paras (pageNum+1) []
-                       (pageLen (pageNum+1)) True
-                       (shapes ++ [(currentShape ++ [Comp (if isPartial then Mid else Begin)
-                                                          pageRemaining])])
+                  iter s{paragraphRemaining=(paragraphRemaining - pageRemaining),
+                         pageNum=(pageNum+1),
+                         currentShape=[],
+                         pageRemaining=(pageLen (pageNum+1)),
+                         isPartial=True,
+                         shapes=(shapes ++ [(currentShape ++ [Comp (if isPartial then Mid else Begin) pageRemaining])])}
