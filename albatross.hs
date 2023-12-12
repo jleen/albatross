@@ -63,7 +63,7 @@ pageShapesNoWidows paras shortPages paradoxLevel =
         Nothing -> Just shapes
         Just p -> if p-1 `elem` shortPages
                   then pageShapesNoWidows paras (applyParadox (paradoxLevel+1)) (paradoxLevel + 1)
-                  else trace ("Adding page " ++ (show (p-1)) ++ " since it's not in " ++ (show shortPages)) $ pageShapesNoWidows paras (shortPages ++ spread (p-1)) paradoxLevel
+                  else pageShapesNoWidows paras (shortPages ++ spread (p-1)) paradoxLevel
         
 applyParadox :: Int -> [Int]
 applyParadox paradox =
