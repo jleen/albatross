@@ -1,5 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
+import Data.Foldable
 import Data.List
 import Debug.Trace
 
@@ -26,8 +27,23 @@ main = do
     let shapes = pageShapesNoWidows paragraphLengths [] 0
     print $ shapes
     print $ fmap (map (\p -> sum [l | Comp _ l <- p])) shapes
+    print $ length shapes
+    case shapes of
+        Nothing -> putStrLn "No solution found"
+        Just x -> do
+            putStrLn "Found solution:"
+            printSolution x
+
+printSolution :: [[Comp]] -> IO ()
+printSolution shapes = do
+    for_ (zip [1..] shapes) $ \(p,x) -> do
+        putStr $ "p. " ++ (show p) ++ " paras "
+        for_ x $ \(Comp nat len) -> do
+            putStr $ show len ++ " "
+        putStrLn ""
 
 
+-- Page numbers are 1-based, for consistency with the real world.
 findFirstWidow :: [[Comp]] -> Maybe Int
 findFirstWidow = fmap succ . findIndex (any (\(Comp n i) -> n == End && i == 1))
 
