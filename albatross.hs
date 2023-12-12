@@ -12,7 +12,7 @@ paragraphLengths=[9,4,6,2,2,2,2,4,1, --remove 6 for unsolvable
                   2,5,4,2,1,3,2,2,1,3,1,6,
                   1,3,2,6,4,4,2,3,5,2,
                   7,4,5,3,6,1,4,3,
-                  4,1,2,2,5,2,5,2,3,1,6,
+                  4,1,2,2,5,2,5,2,3,1,6, --change last 6 to 3 for backtrack
                   6,4,1,1,1,3,5,3,3,6,
                   9,2,2,3,1,1,2,2,1,2,1,1,
                   2,2,2,2,2,3,3,1,1,5,6,8,
@@ -59,11 +59,11 @@ pageShapesNoWidows :: [Int] -> [Int] -> Int -> Maybe [[Comp]]
 pageShapesNoWidows paras shortPages paradoxLevel =
     traceShow shortPages $
     let shapes = pageShapes paras shortPages
-    in traceShow shapes $ case findFirstWidow shapes of
+    in case findFirstWidow shapes of
         Nothing -> Just shapes
-        Just p -> if p `elem` shortPages
-                  then trace "------" $ pageShapesNoWidows paras (applyParadox (paradoxLevel+1)) (paradoxLevel + 1)
-                  else pageShapesNoWidows paras (shortPages ++ spread (p-1)) paradoxLevel
+        Just p -> if p-1 `elem` shortPages
+                  then pageShapesNoWidows paras (applyParadox (paradoxLevel+1)) (paradoxLevel + 1)
+                  else trace ("Adding page " ++ (show (p-1)) ++ " since it's not in " ++ (show shortPages)) $ pageShapesNoWidows paras (shortPages ++ spread (p-1)) paradoxLevel
         
 applyParadox :: Int -> [Int]
 applyParadox paradox =
