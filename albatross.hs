@@ -27,9 +27,6 @@ main = do
     putStrLn "~.~.~  A L B A T R O S S  ~.~.~"
     putStrLn ""
     let shapes = pageShapesNoWidows paragraphLengths [] 0
-    print $ shapes
-    print $ fmap (map (\p -> sum [l | Comp _ l <- p])) shapes
-    print $ length shapes
     case shapes of
         Nothing -> putStrLn "No solution found"
         Just x -> do
@@ -39,10 +36,10 @@ main = do
 
 printSolution :: [[Comp]] -> IO ()
 printSolution shapes = do
-    putStrLn "page  paragraphs"
-    putStrLn "----  ----------"
+    putStrLn "page  lines  paragraphs"
+    putStrLn "----  -----  ----------"
     for_ (zip [1..] shapes) $ \(p,x) -> do
-        putStr $ printf "%4d " (p :: Int)
+        putStr $ printf "%4d  %5d " (p :: Int) $ sum [l | Comp _ l <- x]
         for_ x $ \(Comp nat len) -> do
             putStr $ if nat == End || nat == Mid then "-" else " "
             putStr $ show len
