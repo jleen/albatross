@@ -4,6 +4,7 @@ import Control.Monad
 import Data.Foldable
 import Data.List
 import Debug.Trace
+import Text.Printf
 
 paragraphLengths=[9,4,6,2,2,2,2,4,1, --remove 6 for unsolvable
                   3,2,5,2,6,4,2,1,5,1,3,
@@ -38,13 +39,14 @@ main = do
 
 printSolution :: [[Comp]] -> IO ()
 printSolution shapes = do
+    putStrLn "page  paragraphs"
+    putStrLn "----  ----------"
     for_ (zip [1..] shapes) $ \(p,x) -> do
-        putStr $ "p. " ++ show p ++ " paras "
+        putStr $ printf "%4d " (p :: Int)
         for_ x $ \(Comp nat len) -> do
-            when (nat == End || nat == Mid) $ putStr "-"
+            putStr $ if nat == End || nat == Mid then "-" else " "
             putStr $ show len
             when (nat == Begin || nat == Mid) $ putStr "-"
-            putStr " "
         putStrLn ""
 
 
