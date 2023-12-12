@@ -1,5 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
+import Control.Monad
 import Data.Foldable
 import Data.List
 import Debug.Trace
@@ -34,12 +35,16 @@ main = do
             putStrLn "Found solution:"
             printSolution x
 
+
 printSolution :: [[Comp]] -> IO ()
 printSolution shapes = do
     for_ (zip [1..] shapes) $ \(p,x) -> do
-        putStr $ "p. " ++ (show p) ++ " paras "
+        putStr $ "p. " ++ show p ++ " paras "
         for_ x $ \(Comp nat len) -> do
-            putStr $ show len ++ " "
+            when (nat == End || nat == Mid) $ putStr "-"
+            putStr $ show len
+            when (nat == Begin || nat == Mid) $ putStr "-"
+            putStr " "
         putStrLn ""
 
 
