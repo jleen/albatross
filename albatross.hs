@@ -20,7 +20,7 @@ paragraphLengths=[9,4,6,2,2,2,2,4,1, --remove 6 for unsolvable
                   4,3,7,3,4,2,4,3,4,3,8,5,4]
 targetHeight = 32
 
-data Comp = Comp Nature Int deriving Show
+data Comp = Comp { nature :: Nature, lineCount :: Int } deriving (Show, Eq)
 data Nature = Entire | Begin | Mid | End deriving (Show, Eq)
 
 main = do
@@ -39,7 +39,7 @@ printSolution shapes = do
     putStrLn "page  lines  paragraphs"
     putStrLn "----  -----  ----------"
     for_ (zip [1..] shapes) $ \(p,x) -> do
-        putStr $ printf "%4d  %5d " (p :: Int) $ sum [l | Comp _ l <- x]
+        putStr $ printf "%4d  %5d " (p :: Int) $ sum $ map lineCount x
         for_ x $ \(Comp nat len) -> do
             putStr $ if nat == End || nat == Mid then "-" else " "
             putStr $ show len
@@ -47,9 +47,11 @@ printSolution shapes = do
         putStrLn ""
 
 
+(<.>) = fmap . fmap
+
 -- Page numbers are 1-based, for consistency with the real world.
 findFirstWidow :: [[Comp]] -> Maybe Int
-findFirstWidow = fmap succ . findIndex (any (\(Comp n i) -> n == End && i == 1))
+findFirstWidow = succ <.> findIndex (any (== Comp End 1))
 
 
 spread p = [v,v+1] where v = 2 * (p `div` 2)
@@ -82,24 +84,24 @@ data State = State {
 
 
 pageShapes :: [Int] -> [Int] -> [[Comp]]
-pageShapes (para:paras) shortPages = iter $ State para paras 1 [] (pageLen 1) False []
+pageShapes (para:paras) shortPages = go $ State para paras 1 [] (pageLen 1) False []
       where pageLen p = targetHeight - if p `elem` shortPages then 1 else 0
-            iter s@State{..}
+            go s@State{..}
               | paragraphRemaining == 0 = case paras of
                   [] -> shapes ++ [currentShape]
-                  p:ps -> iter s{paragraphRemaining=p, paras=ps}
+                  p:ps -> go s{paragraphRemaining=p, paras=ps}
               | pageRemaining == 0 =
-                  iter s{pageNum=(pageNum+1),
+                  go s{pageNum=(pageNum+1),
                          currentShape=[],
                          pageRemaining=(pageLen (pageNum+1)),
                          shapes=(shapes ++ [currentShape])}
               | paragraphRemaining <= pageRemaining =
-                  iter s{paragraphRemaining=0,
+                  go s{paragraphRemaining=0,
                          currentShape=(currentShape ++ [Comp (if isPartial then End else Entire) paragraphRemaining]),
                          pageRemaining=(pageRemaining - paragraphRemaining),
                          isPartial=False}
               | otherwise =
-                  iter s{paragraphRemaining=(paragraphRemaining - pageRemaining),
+                  go s{paragraphRemaining=(paragraphRemaining - pageRemaining),
                          pageNum=(pageNum+1),
                          currentShape=[],
                          pageRemaining=(pageLen (pageNum+1)),
